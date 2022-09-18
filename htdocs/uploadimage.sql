@@ -8,7 +8,7 @@ USE uploadimage;
 CREATE TABLE relogios (
     id_relogio int primary key auto_increment,
     name varchar(255) not null,
-    preco float,
+    preco decimal(6,2),
     qtd_estoque int not null,
     img varchar(255) not null,
     descr text not null

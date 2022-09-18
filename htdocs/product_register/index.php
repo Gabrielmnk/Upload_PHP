@@ -6,7 +6,7 @@ $html_form = <<<HTML
     <div class="container">
         <div class="row justify-content-center">
 
-    <form class="col-sm-10 col-md-8 col-lg-6 " method="POST" enctype="multipart/form-data" action="">
+    <form class="col-sm-10 col-md-8 col-lg-6 " action="index.php" method="POST" enctype="multipart/form-data" action="">
     <h1>Cadastro de Relógios</h1>
 
     <div class="form-floating mb-3">
@@ -14,8 +14,8 @@ $html_form = <<<HTML
                 <label for="txtEmail">Nome</label>
      </div>
      <div class="form-floating mb-3 ">
-             <input type="text" name="preco" id="preco" class="form-control" placeholder=" " autofocus>
-                <label for="txtEmail">Preco</label>
+             <input type="text" name="preco" class="form-control" placeholder="" onkeypress="$(this).mask('#.##0,00', {reverse: true});">
+                <label for="txtEmail">Preço em R$</label>
      </div>
      <div class="form-floating mb-3">
              <input type="number" name="qtd_estoque" id="qtd_estoque" class="form-control" placeholder=" " autofocus>
@@ -27,9 +27,9 @@ $html_form = <<<HTML
     </div>
 
         <p><label for="">Selecione o Arquivo</label>
-            <input type="file" name="arquivo" id="" >
+         <input type="file" name="arquivo">
         </p>
-        <button name="upload" type="submit">Enviar Arquivo</button>
+        <button class="btn btn-dark" type="submit">Cadastrar</button>
         </form>
  HTML;
 
@@ -72,11 +72,12 @@ HTML;
         else :
 
             $path = $folder . $newFileName . "." . $extension;
-
             $name = $_POST['name'];
-            $price = $_POST['preco'];
+            $price = str_replace('.', '', $_POST['preco']);
+            $priceFormater = str_replace(',', '.', $price);
             $estoque = $_POST['qtd_estoque'];
             $desc = $_POST['desc'];
+
 
             if (empty($name) or empty($price) or empty($estoque) or empty($desc)) :
                 $page_content .= <<<HTML
@@ -88,9 +89,8 @@ HTML;
 
             else :
                 $move = move_uploaded_file($file["tmp_name"], $path);
-                $sql = "INSERT INTO relogios (name,preco,qtd_estoque,img,descr) VALUES('$name','$price','$estoque','$path',$desc)";
+                $sql = "INSERT INTO relogios (name,preco,qtd_estoque,img,descr) VALUES('$name','$priceFormater','$estoque','$path','$desc')";
                 $conn->query($sql);
-
 
                 $page_content .= <<<HTML
         <div class="alert alert-success text-center" role="alert">
@@ -112,9 +112,17 @@ endif;
 
 
 
-
 require($_SERVER['DOCUMENT_ROOT'] . '/header.php');
 
-echo $page_content;
+echo <<<HTML
+$page_content;
+
+
+<script src="script.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js"></script>
+
+HTML;
+
 
 require($_SERVER['DOCUMENT_ROOT'] . '/footer.php');
